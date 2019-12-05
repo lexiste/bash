@@ -1,0 +1,15 @@
+
+# ignore the file that I store login data in
+login.json
+
+# ignore all log files
+**/log
+*.log
+
+# ignore misc other temp or build like files
+*.bak
+*.swp
+*.o
+*.tmp
+*.lock
+
