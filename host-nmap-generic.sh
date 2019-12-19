@@ -40,15 +40,12 @@ while IFS=' ' read line || [[ -n "$line" ]]; do
         ;;
       80|443|8080|8443)
         echo -e "${GOOD}[+]${NC} $rHost limited HTTP(S) checks"
-        ##nmap -p $rPort -sV -Pn --script vulners,ssl-enum-ciphers,http-apache*,http-brute,http-enum,http-headers,http-iis*,http-screenshot --version-intensity=5 --script-timeout 10m -oN $rHost\_$rPort-$(date +%d%b).txt $rHost
-        ##nmap -p $rPort -sV -Pn --script vulners,ssl-enum-ciphers,http-enum,http-headers,http-screenshot --version-intensity=5 --script-timeout 3m -oN $rHost\_$rPort-$(date +%d%b).txt $rHost
-
         # check if we have cuty capture which we use in out http-screenshot module when running with a GUI
         if [[ -x "/usr/bin/cutycapt" ]]
         then
-          nmap -p $rPort -sV -Pn --script ssl-enum-ciphers,http-enum,http-headers,http-screenshot --version-intensity=5 --script-timeout 3m -oN $rHost\_$rPort-$(date +%d%b).txt $rHost
+          nmap -p $rPort -sV -Pn --script http-apache-server-status,http-config-backup,http-backup-finder,ssl-enum-ciphers,http-enum,http-headers,http-screenshot --version-intensity=5 --script-timeout 3m -oN $rHost\_$rPort-$(date +%d%b).txt $rHost
         else
-          nmap -p $rPort -sV -Pn --script ssl-enum-ciphers,http-enum,http-headers --version-intensity=5 --script-timeout 3m -oN $rHost\_$rPort-$(date +%d%b).txt $rHost
+          nmap -p $rPort -sV -Pn --script http-apache-server-status,http-config-backup,http-backup-finder,ssl-enum-ciphers,http-enum,http-headers --version-intensity=5 --script-timeout 3m -oN $rHost\_$rPort-$(date +%d%b).txt $rHost
         fi
         if [ $? -eq 139 ]
         then

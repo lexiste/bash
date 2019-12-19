@@ -170,4 +170,4 @@ main() {
 
 header
 main
-cat $folder/${0##*/}.log
+

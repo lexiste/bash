@@ -11,7 +11,7 @@ if ! [ -r "$1" ]; then
   exit -1
 fi
 
-domains=(".gspt.net" ".gsiccorp.net")
+domains=(".gspt.net" ".gsiccorp.net" ".innotrac.com")
 while read name; do
   for i in ${!domains[*]}
   do
@@ -21,8 +21,8 @@ while read name; do
     if [ $? -eq 0 ]; then
       ip=$(nslookup $host | awk -F": " '/Address/{print $2}' | tr '\n' ' ')
       echo $host $ip
-    else
-      echo $host not found
+#    else
+#      echo $host not found
     fi
   done
 done < "$1"
