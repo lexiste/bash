@@ -37,6 +37,8 @@ __dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 __file="${__dir}/$(basename "${BASH_SOURCE[0]}")"
 __base="$(basename ${__file} .sh)"
 
+set -eu # exit on error or unset variables
+
 folder=~/blackhole
 spamhaus="$folder/spamhaus-drop"
 bogons="$folder/bogons-ipv4"
@@ -46,7 +48,7 @@ torNodes="$folder/tor-exit-nodes"
 ## redirect stdout/stderr to file
 exec &> $folder/${0##*/}.log
 
-NC='\e[0m' #reset
+RST='\e[0m' #reset
 ALRT='\e[97m\e[41m' #white fg / red bg
 GOOD='\e[92m' #green fg / no bg (default)
 
@@ -54,7 +56,7 @@ header() {
   clear
   echo -e """
 ----------------------------------------
-Run Date: ${GOOD}$(date +%d-%b-%Y\ %H:%M)${NC}
+Run Date: ${GOOD}$(date +%d-%b-%Y\ %H:%M)${RST}
 source folder: ${folder}
 spamhaus file: ${spamhaus}
 bogon file: ${bogons}
@@ -65,56 +67,56 @@ tor exit nodes file: ${torNodes} [for record keeping]
 
 main() {
   if [ ! -d "${folder}" ]; then
-     echo -e "${ALRT}[!!] Creating folder ${folder}${NC}"
+     echo -e "${ALRT}[!!] Creating folder ${folder}${RST}"
      mkdir -p ${folder}
   fi
 
   if [ -f "${spamhaus}" ]; then
-    echo -e "move ${GOOD}${spamhaus}${NC} to ${GOOD}${spamhaus}.$(date +%d%b)${NC}"
+    echo -e "move ${GOOD}${spamhaus}${RST} to ${GOOD}${spamhaus}.$(date +%d%b)${RST}"
     mv --force ${spamhaus} ${spamhaus}.$(date +%d%b)
   fi
 
   if [ -f "${bogons}" ]; then
-    echo -e "move ${GOOD}${bogons}${NC} to ${GOOD}${bogons}.$(date +%d%b)${NC}"
+    echo -e "move ${GOOD}${bogons}${RST} to ${GOOD}${bogons}.$(date +%d%b)${RST}"
     mv --force ${bogons} ${bogons}.$(date +%d%b)
   fi
 
   if [ -f "${talos}" ]; then
-    echo -e "move ${GOOD}${talos}${NC} to ${GOOD}${talos}.$(date +%d%b)${NC}"
+    echo -e "move ${GOOD}${talos}${RST} to ${GOOD}${talos}.$(date +%d%b)${RST}"
     mv --force ${talos} ${talos}.$(date +%d%b)
   fi
 
   if [ -f "${torNodes}" ]; then
-    echo -e "move ${GOOD}${torNodes}${NC} to ${GOOD}${torNodes}.$(date +%d%b)${NC}"
+    echo -e "move ${GOOD}${torNodes}${RST} to ${GOOD}${torNodes}.$(date +%d%b)${RST}"
     mv --force ${torNodes} ${torNodes}.$(date +%d%b)
   fi
 
   echo ""
 
   wget --timeout=20 --quiet -O ${spamhaus} https://spamhaus.org/drop/drop.lasso
-  echo -e "${GOOD}[+]${NC} downloading ${spamhaus} file"
+  echo -e "${GOOD}[+]${RST} downloading ${spamhaus} file"
 
   wget --timeout=20 --quiet -O ${bogons} https://www.team-cymru.org/Services/Bogons/fullbogons-ipv4.txt
-  echo -e "${GOOD}[+]${NC} downloading ${bogons} file"
+  echo -e "${GOOD}[+]${RST} downloading ${bogons} file"
 
-  wget --timeout=20 --quiet -O ${talos} https://talosintelligence.com/documents/ip-blacklist
+  wget --timeout=20 --quiet -O ${talos} https://talosintelligeRSTe.com/documents/ip-blacklist
   if [ -s "${talos}" ]; then
-    echo -e "${GOOD}[+]${NC} downloading ${talos} file"
+    echo -e "${GOOD}[+]${RST} downloading ${talos} file"
   else
-    echo -e "${ALRT}[-]${NC} downloading ${talos} file"
+    echo -e "${ALRT}[-]${RST} downloading ${talos} file"
   fi
 
   wget --quiet -O ${torNodes} https://check.torproject.org/exit-addresses
   if [ -s "${torNodes}" ]; then
-    echo -e "${GOOD}[+]${NC} downloading ${torNodes} file"
+    echo -e "${GOOD}[+]${RST} downloading ${torNodes} file"
   else
-    echo -e "${ALRT}[-]${NC} downloading ${torNodes} file"
+    echo -e "${ALRT}[-]${RST} downloading ${torNodes} file"
   fi
 
   echo ""
 
   if [ ! -s "${spamhaus}" ]; then
-     echo -e "${ALRT}[!!]${NC} unable to find drop list file ${spamhaus}"
+     echo -e "${ALRT}[!!]${RST} unable to find drop list file ${spamhaus}"
      echo -e "perhaps do: wget https://spamhaus.org/drop/drop.lasso -O ${spamhaus}"
      exit 1
   else
@@ -126,7 +128,7 @@ main() {
   fi
 
   if [ ! -s "${bogons}" ]; then
-     echo -e "${ALRT}[!!]${NC} unable to find the bogons file $bogons"
+     echo -e "${ALRT}[!!]${RST} unable to find the bogons file $bogons"
      echo -e "perhaps a visit to https://www.team-cymru.org/Services/Bogons/fullbogons-ipv4.txt"
      exit 1
   else
@@ -137,7 +139,7 @@ main() {
   fi
 
   if [ ! -x /sbin/iptables ]; then
-     echo -e "${ALRT}[!!]${NC} missing iptables command line tool, exiting"
+     echo -e "${ALRT}[!!]${RST} missing iptables command line tool, exiting"
      exit 1
   fi
 
@@ -146,7 +148,7 @@ main() {
   ##  in a prod world creating a backup, or configuration of other needed (ie. required)
   ##  rules would be in another file to be loaded as well
   ##  (EX: block telnet in/out, whitelist known hosts, etc.)
-  echo -e "${ALRT}[!!]${NC} purging previous iptables rules..."
+  echo -e "${ALRT}[!!]${RST} purging previous iptables rules..."
   /sbin/iptables -P INPUT ACCEPT
   /sbin/iptables -P FORWARD ACCEPT
   /sbin/iptables -P OUTPUT ACCEPT
@@ -156,7 +158,7 @@ main() {
   /sbin/iptables -X
 
   ## looks like we have the input file and iptables located
-  echo -e "${GOOD}loading${NC} $spamhaus into iptables..."
+  echo -e "${GOOD}loading${RST} $spamhaus into iptables..."
   cat "${spamhaus}" \
    | sed -e 's/;.*//' \
    | grep -v '^ *$' \
@@ -170,4 +172,3 @@ main() {
 
 header
 main
-
