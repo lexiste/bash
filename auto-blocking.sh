@@ -33,26 +33,36 @@
 ##  [+] added support for bulk tor exit notes as we are seeing uptick in bad actors coming from various tor nodes
 ##
 VERSION="0.2.1"
-__dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-__file="${__dir}/$(basename "${BASH_SOURCE[0]}")"
-__base="$(basename ${__file} .sh)"
 
 set -eu # exit on error or unset variables
 
 folder=~/blackhole
+logfile="$folder/blackhole.log"
 spamhaus="$folder/spamhaus-drop"
 bogons="$folder/bogons-ipv4"
 talos="$folder/talos-ioc"
 torNodes="$folder/tor-exit-nodes"
 
-## redirect stdout/stderr to file
-exec &> $folder/${0##*/}.log
-
 RST='\e[0m' #reset
 ALRT='\e[97m\e[41m' #white fg / red bg
 GOOD='\e[92m' #green fg / no bg (default)
 
+init() {
+	# check if the base folder exists, create if not
+  if [ ! -d "${folder}" ]; then
+     echo -e "${ALRT}[!!] Creating folder ${folder}${RST}"
+     mkdir -p ${folder}
+  fi
+	# check for log file to write to, create if not
+	if [ ! -f "${logfile}" ]; then
+		touch ${logfile}
+	fi
+	exec &> $logfile
+}
+
 header() {
+
+	## redirect stdout/stderr to file
   clear
   echo -e """
 ----------------------------------------
@@ -66,11 +76,6 @@ tor exit nodes file: ${torNodes} [for record keeping]
 }
 
 main() {
-  if [ ! -d "${folder}" ]; then
-     echo -e "${ALRT}[!!] Creating folder ${folder}${RST}"
-     mkdir -p ${folder}
-  fi
-
   if [ -f "${spamhaus}" ]; then
     echo -e "move ${GOOD}${spamhaus}${RST} to ${GOOD}${spamhaus}.$(date +%d%b)${RST}"
     mv --force ${spamhaus} ${spamhaus}.$(date +%d%b)
@@ -99,7 +104,7 @@ main() {
   wget --timeout=20 --quiet -O ${bogons} https://www.team-cymru.org/Services/Bogons/fullbogons-ipv4.txt
   echo -e "${GOOD}[+]${RST} downloading ${bogons} file"
 
-  wget --timeout=20 --quiet -O ${talos} https://talosintelligeRSTe.com/documents/ip-blacklist
+  wget --timeout=20 --quiet -O ${talos} https://talosintelligence.com/documents/ip-blacklist
   if [ -s "${talos}" ]; then
     echo -e "${GOOD}[+]${RST} downloading ${talos} file"
   else
@@ -149,13 +154,13 @@ main() {
   ##  rules would be in another file to be loaded as well
   ##  (EX: block telnet in/out, whitelist known hosts, etc.)
   echo -e "${ALRT}[!!]${RST} purging previous iptables rules..."
-  /sbin/iptables -P INPUT ACCEPT
-  /sbin/iptables -P FORWARD ACCEPT
-  /sbin/iptables -P OUTPUT ACCEPT
-  /sbin/iptables -t nat -F
-  /sbin/iptables -t mangle -F
-  /sbin/iptables -F
-  /sbin/iptables -X
+  sudo /sbin/iptables -P INPUT ACCEPT
+  sudo  /sbin/iptables -P FORWARD ACCEPT
+  sudo  /sbin/iptables -P OUTPUT ACCEPT
+  sudo  /sbin/iptables -t nat -F
+  sudo  /sbin/iptables -t mangle -F
+  sudo  /sbin/iptables -F
+  sudo  /sbin/iptables -X
 
   ## looks like we have the input file and iptables located
   echo -e "${GOOD}loading${RST} $spamhaus into iptables..."
@@ -163,12 +168,13 @@ main() {
    | sed -e 's/;.*//' \
    | grep -v '^ *$' \
    | while read singleBlock ; do
-     /sbin/iptables -I INPUT -s "$singleBlock" -j DROP
-     /sbin/iptables -I OUTPUT -d "$singleBlock" -j DROP
-     /sbin/iptables -I FORWARD -s "$singleBlock" -j DROP
-     /sbin/iptables -I FORWARD -d "$singleBlock" -j DROP
+     sudo /sbin/iptables -I INPUT -s "$singleBlock" -j DROP
+     sudo /sbin/iptables -I OUTPUT -d "$singleBlock" -j DROP
+     sudo /sbin/iptables -I FORWARD -s "$singleBlock" -j DROP
+     sudo /sbin/iptables -I FORWARD -d "$singleBlock" -j DROP
   done
 }
 
+init
 header
 main
