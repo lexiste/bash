@@ -9,7 +9,7 @@ if [ ! $(findmnt -M "/mnt/vm-shared") ]; then
    if [ $? -ne 0 ]; then
       echo "${ALRT}[!]${NC} An error occured in trying to mount the vmWare device!"
    else
-      echo "mounted vm-shared folder to /mnt/vm-shared"
+      echo "${GOOD}[+]${NC} Mounted vm-shared folder to /mnt/vm-shared"
    fi
 else
    echo "vm-shared already appears to be mounted"
