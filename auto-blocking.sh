@@ -29,10 +29,19 @@
 ##  (public to private networks)
 ##
 ## 2019-09-03
-##  [+] added support for Cisco Talos IOC download, nothing more than a holder for more searching for bad IP's based on IOC's
-##  [+] added support for bulk tor exit notes as we are seeing uptick in bad actors coming from various tor nodes
+##  [+] added support for Cisco Talos IOC download, nothing more than a holder
+##      for more searching for bad IP's based on IOC's
+##  [+] added support for bulk tor exit notes as we are seeing uptick in bad
+##      actors coming from various tor nodes
 ##
-VERSION="0.2.1"
+## 2020-02-04
+##  release of Kali 2020.1 and the move to not using root as the normal fullon
+##  means the script needs to handle regular user execution, and elevating to
+##  sudo for the iptables statements.  also, since this was a clean build, there
+##  where some issues with having `set -eu` and files/folders not existing with
+##  error handling and exiting which needed fixed
+##
+VERSION="0.3.1"
 
 set -eu # exit on error or unset variables
 
@@ -57,12 +66,12 @@ init() {
 	if [ ! -f "${logfile}" ]; then
 		touch ${logfile}
 	fi
+
+  ## redirect stdout/stderr to file
 	exec &> $logfile
 }
 
 header() {
-
-	## redirect stdout/stderr to file
   clear
   echo -e """
 ----------------------------------------
@@ -96,15 +105,26 @@ main() {
     mv --force ${torNodes} ${torNodes}.$(date +%d%b)
   fi
 
-  echo ""
+  echo "Completed backing up files ... downloading new files from sources..."
 
   wget --timeout=20 --quiet -O ${spamhaus} https://spamhaus.org/drop/drop.lasso
-  echo -e "${GOOD}[+]${RST} downloading ${spamhaus} file"
+  # checking file size > 0, better than simple if it exists
+  if [ -s ${spamhaus} ]; then
+    echo -e "${GOOD}[+]${RST} downloading ${spamhaus} file"
+  else
+    echo -e "${ALRT}[-]${RST} downloading ${spamhaus} file"
+  fi
 
   wget --timeout=20 --quiet -O ${bogons} https://www.team-cymru.org/Services/Bogons/fullbogons-ipv4.txt
-  echo -e "${GOOD}[+]${RST} downloading ${bogons} file"
+  # checking file size > 0, better than simple if it exists
+  if [ -s ${bogons} ]; then
+    echo -e "${GOOD}[+]${RST} downloading ${bogons} file"
+  else
+    echo -e "${ALRT}[-]${RST} downloading ${bogons} file"
+  fi
 
   wget --timeout=20 --quiet -O ${talos} https://talosintelligence.com/documents/ip-blacklist
+  # checking file size > 0, better than simple if it exists
   if [ -s "${talos}" ]; then
     echo -e "${GOOD}[+]${RST} downloading ${talos} file"
   else
@@ -118,7 +138,7 @@ main() {
     echo -e "${ALRT}[-]${RST} downloading ${torNodes} file"
   fi
 
-  echo ""
+  echo "Completed downloading files ... processing and loading into iptables..."
 
   if [ ! -s "${spamhaus}" ]; then
      echo -e "${ALRT}[!!]${RST} unable to find drop list file ${spamhaus}"
@@ -155,12 +175,12 @@ main() {
   ##  (EX: block telnet in/out, whitelist known hosts, etc.)
   echo -e "${ALRT}[!!]${RST} purging previous iptables rules..."
   sudo /sbin/iptables -P INPUT ACCEPT
-  sudo  /sbin/iptables -P FORWARD ACCEPT
-  sudo  /sbin/iptables -P OUTPUT ACCEPT
-  sudo  /sbin/iptables -t nat -F
-  sudo  /sbin/iptables -t mangle -F
-  sudo  /sbin/iptables -F
-  sudo  /sbin/iptables -X
+  sudo /sbin/iptables -P FORWARD ACCEPT
+  sudo /sbin/iptables -P OUTPUT ACCEPT
+  sudo /sbin/iptables -t nat -F
+  sudo /sbin/iptables -t mangle -F
+  sudo /sbin/iptables -F
+  sudo /sbin/iptables -X
 
   ## looks like we have the input file and iptables located
   echo -e "${GOOD}loading${RST} $spamhaus into iptables..."
