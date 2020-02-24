@@ -1,18 +1,18 @@
 #!/usr/bin/env bash
 
-NC='\e[0m' #reset
+RST='\e[0m' #reset
 ALRT='\e[97m\e[41m' #white fg / red bg
 GOOD='\e[92m' #green fg / no bg (default)
 
 if [ ! $(findmnt -M "/mnt/vm-shared") ]; then
    sudo /usr/bin/vmhgfs-fuse .host:/vm-shared /mnt/vm-shared -o subtype=vmhgfs-fuse,allow_other
    if [ $? -ne 0 ]; then
-      echo "${ALRT}[!]${NC} An error occured in trying to mount the vmWare device!"
+      echo -e "${ALRT}[!]${RST} An error occured in trying to mount the vmWare device!\n"
    else
-      echo "${GOOD}[+]${NC} Mounted vm-shared folder to /mnt/vm-shared"
+      echo -e "${GOOD}[+]${RST} Mounted vm-shared folder to /mnt/vm-shared\n"
    fi
 else
-   echo "vm-shared already appears to be mounted"
+   echo -e "vm-shared already appears to be mounted\n"
 fi
 
 sleep 2s

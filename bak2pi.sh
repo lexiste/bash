@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-echo "rsynch scripts, pentest & other tools to pi"
+echo -e "rsynch scripts, pentest & other tools to pi"
 
 ## check for a new month
 ssh pi@pluto '/backup/backups.sh newMonth'
@@ -14,13 +14,16 @@ ssh pi@pluto '/backup/backups.sh newMonth'
 rsync -azWv -e "ssh -i ~/.ssh/todd" --stats --delete ~/scripts pi@pluto:/backup/current
 rsync -azWv -e "ssh -i ~/.ssh/todd" --stats --delete ~/pentest pi@pluto:/backup/current
 rsync -azWv -e "ssh -i ~/.ssh/todd" --stats --delete ~/tools pi@pluto:/backup/current
+rsync -azWv -e "ssh -i ~/.ssh/todd" --stats --delete ~/learning pi@pluto:/backup/current
 rsync -azWv -e "ssh -i ~/.ssh/todd" --stats --delete ~/.ssh pi@pluto:/backup/current
+rsync -azWv -e "ssh -i ~/.ssh/todd" --stats --delete ~/logs pi@pluto:/backup/current
 
 ## individual key files we want
 rsync -azWv -e "ssh -i ~/.ssh/todd" --stats --delete ~/.bashrc pi@pluto:/backup/current/
+rsync -azWv -e "ssh -i ~/.ssh/todd" --stats --delete ~/.bash_aliases pi@pluto:/backup/current/
 rsync -azWv -e "ssh -i ~/.ssh/todd" --stats --delete ~/.bash_history pi@pluto:/backup/current/
 rsync -azWv -e "ssh -i ~/.ssh/todd" --stats --delete ~/.vimrc pi@pluto:/backup/current/
-rsync -azWv -e "ssh -i ~/.ssh/todd" --stats --delete ~/.tmux.conf pi@pluto:/backup/current/
+rsync -azWv -e "ssh -i ~/.ssh/todd" --stats --delete ~/radial-mass.conf pi@pluto:/backup/current/
 #rsync -azWv -e "ssh -i ~/.ssh/todd" --stats --delete ~/.git* pi@pluto:/backup/current/
 
 # make backup and check
