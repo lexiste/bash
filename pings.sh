@@ -9,17 +9,17 @@ _u='\033[4m'    # Underline text
 if ! [ -r "$1" ]
 then
   echo -e "${_c}[!] no file named passed or file not found${_r}"
-  exit -1
+  exit 1
 fi
 
 cat "$1" | while read host
 do
-  ping -c 1 -w 2 "$line" &>/dev/null
+  ping -c 2 -q ${host} > /dev/null
   if [ $? -eq 0 ]
   then
     ip=$(nslookup $host | awk -F": " '/Address/{print $2}' | tr '\n' ' ')
-    echo -e "${_r}[+]${_r} $host $ip up"
+    echo -e "${_g}[+]${_r} ${host} ${ip} up"
   else
-    echo -e "${_a}[!]${_r} $host ${_c}down${_r}"
+    echo -e "${_a}[!]${_r} ${host} ${_c}down${_r}"
   fi
 done # cat ...
