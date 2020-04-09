@@ -7,9 +7,9 @@ GOOD='\e[92m' #green fg / no bg (default)
 if [ ! $(findmnt -M "/mnt/vm-shared") ]; then
    sudo /usr/bin/vmhgfs-fuse .host:/vm-shared /mnt/vm-shared -o subtype=vmhgfs-fuse,allow_other
    if [ $? -ne 0 ]; then
-      echo -e "${ALRT}[!]${RST} An error occured in trying to mount the vmWare device!\n"
+      echo -e "${ALRT}[!]${RST} An error occured in trying to mount the vmWare device!"
    else
-      echo -e "${GOOD}[+]${RST} Mounted vm-shared folder to /mnt/vm-shared\n"
+      echo -e "${GOOD}[+]${RST} Mounted vm-shared folder to /mnt/vm-shared"
    fi
 else
    echo -e "vm-shared already appears to be mounted\n"

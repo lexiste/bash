@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-_r='\033[0m'    #reset
+_r='\033[0m'    # reset
 _a='\033[1;91m' # Bold light Red FG / default bg
 _g='\033[1;92m' # Bold light green FG / default bg
 _c='\033[33m'   # Yellow FG
