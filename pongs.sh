@@ -11,7 +11,7 @@ if ! [ -r "$1" ]; then
   exit -1
 fi
 
-domains=("gspt.net" "gsiccorp.net" "innotrac.com" "prd.gsi.local")
+domains=("gspt.net" "gsiccorp.net" "innotrac.com" "prd.gsi.local" "us.gspt.net")
 
 while read name; do
   ## when importing a file from windows, we need to trim the trailing line feed
@@ -28,7 +28,7 @@ while read name; do
       ip=$(nslookup $fqdn | awk -F": " '/Address/{print $2}' | tr '\n' ' ')
       echo $fqdn $ip
 #    else
-#      echo $fqdn not found
+#      echo $fqdn "N/A"
     fi
   done
 done < "$1"
