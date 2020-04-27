@@ -59,6 +59,7 @@ if [[ "${_EXISTS}" -gt "0" ]]; then
   exit ${EXIT_CODES['duplicate']};
 else
   echo -e "${_TARGET_IP}\t${_TARGET}.htb" | sudo tee --append /etc/hosts
+  echo -e "${GOOD}[+]${RESET} ${_TARGET}.htb added to /etc/hosts file"
 fi
 
 ## check if the target directory already exists; create if not
