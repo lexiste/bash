@@ -38,7 +38,7 @@ while IFS=' ' read line || [[ -n "$line" ]]; do
         echo -e "${GOOD}[+]${NC} $rHost DNS checks and request zone transfer for gsiccorp.net domain"
         nmap -p $rPort -sV -Pn --script vulners,dns-cache-snoop,dns-zone-transfer --script-args dns-zone-transfer.domain=gsiccorp.net --host-timeout 3m --script-timeout 3m -oN $rHost\_$rPort-$(date +%d%b).txt $rHost
         ;;
-      80|443|8080|8443)
+      80|443|8080|8081|8443)
         echo -e "${GOOD}[+]${NC} $rHost limited HTTP(S) checks"
         # check if we have cuty capture which we use in out http-screenshot module when running with a GUI
         if [[ -x "/usr/bin/cutycapt" ]]
@@ -67,6 +67,8 @@ while IFS=' ' read line || [[ -n "$line" ]]; do
         ;;
       *)
         echo -e "${ALRT}[!!]${NC} undefined port to check, please update case statement with port '$rPort' and query options"
+        echo -e "${CAUTION}[**]${NC} running version check for some generic information on irregular port '$rPort'"
+        nmap -p $rPort -sV -Pn $rHost\_$rPort-$(date +%d%b).txt $rHost
         ;;
    esac
 
