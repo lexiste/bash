@@ -67,6 +67,8 @@ while IFS=' ' read line || [[ -n "$line" ]]; do
         ;;
       *)
         echo -e "${ALRT}[!!]${NC} undefined port to check, please update case statement with port '$rPort' and query options"
+        echo -e "${CAUTION}[**]${NC} running version check for some generic information on port '$rPort'"
+        nmap -p $rPort -sV -Pn $rHost\_$rPort-$(date +%d%b).txt $rHost
         ;;
    esac
 
