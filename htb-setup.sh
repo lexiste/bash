@@ -20,7 +20,7 @@ EXIT_CODES['failure']=10
 
 show_usage() {
   echo -e """Setup HTB folder and update the hosts file.
-  Usage: $0 -t target -a ip_address """
+  Usage: $0 -t target -a ip_address"""
   exit ${EXIT_CODES['ok']};
 }
 
@@ -28,9 +28,10 @@ if [[ $# -eq 0 ]]; then
   show_usage;
 fi
 
+## path is optional, this is our default
 while getopts "t:a:" FLAG
 do
-  case $FLAG in
+  case ${FLAG} in
     t)
       _TARGET=${OPTARG}
       ;;
@@ -72,5 +73,5 @@ if ! [[ -d ~/learning/htb/htb-${_TARGET} ]]; then
   fi
 else
   echo -e "${ALERT}[!]${RESET} htb-${_TARGET} directory already exists"
-  exit ${EXIT_CODES['duplicate']};
+  #exit ${EXIT_CODES['duplicate']};
 fi
