@@ -28,11 +28,11 @@ while IFS=' ' read line || [[ -n "$line" ]]; do
    case $rPort in
       20|21|69|989|990)
         echo -e "${GOOD}[+]${NC} $rHost FTP/SFTP/FTPS checks"
-        nmap -p $rPort -sV -Pn --script vulners,ftp* --host-timeout 10m --script-timeout 5m -oN $rHost\_$rPort-$(date +%d%b).txt  $rHost
+        nmap -p $rPort -sV -Pn --script vulners,ftp* --script-timeout 1m -oN $rHost\_$rPort-$(date +%d%b).txt  $rHost
         ;;
       22)
         echo -e "${GOOD}[+]${NC} $rHost SSH checks"
-        nmap -p $rPort -sV -Pn --script vulners,ssh2-enum-algos,default --host-timeout 10m --script-timeout 5m -oN $rHost\_$rPort-$(date +%d%b).txt $rHost
+        nmap -p $rPort -sV -Pn --script vulners,ssh2-enum-algos,default --script-timeout 1m -oN $rHost\_$rPort-$(date +%d%b).txt $rHost
         ;;
       53)
         echo -e "${GOOD}[+]${NC} $rHost DNS checks and request zone transfer for gsiccorp.net domain"
@@ -43,9 +43,9 @@ while IFS=' ' read line || [[ -n "$line" ]]; do
         # check if we have cuty capture which we use in out http-screenshot module when running with a GUI
         if [[ -x "/usr/bin/cutycapt" ]]
         then
-          nmap -p $rPort -sV -Pn --script http-apache-server-status,http-config-backup,http-backup-finder,ssl-enum-ciphers,http-enum,http-headers,http-screenshot --version-intensity=5 --script-timeout 3m -oN $rHost\_$rPort-$(date +%d%b).txt $rHost
+          nmap -p $rPort -sV -Pn --script http-apache-server-status,http-config-backup,http-backup-finder,ssl-enum-ciphers,http-enum,http-headers,http-screenshot --version-intensity=5 -oN $rHost\_$rPort-$(date +%d%b).txt $rHost
         else
-          nmap -p $rPort -sV -Pn --script http-apache-server-status,http-config-backup,http-backup-finder,ssl-enum-ciphers,http-enum,http-headers --version-intensity=5 --script-timeout 3m -oN $rHost\_$rPort-$(date +%d%b).txt $rHost
+          nmap -p $rPort -sV -Pn --script http-apache-server-status,http-config-backup,http-backup-finder,ssl-enum-ciphers,http-enum,http-headers --version-intensity=5 -oN $rHost\_$rPort-$(date +%d%b).txt $rHost
         fi
         if [ $? -eq 139 ]
         then
@@ -59,19 +59,15 @@ while IFS=' ' read line || [[ -n "$line" ]]; do
         ;;
       3389)
         echo -e "${GOOD}[+]${NC} $rHost RDP checks"
-        nmap -p $rPort -sV -Pn --script vulners,rdp-vuln-ms12-020,rdp-enum-encryption --script-timeout 5m -oN $rHost\_$rPort-$(date +%d%b).txt $rHost
+        nmap -p $rPort -sV -Pn --script vulners,rdp-vuln-ms12-020 -oN $rHost\_$rPort-$(date +%d%b).txt $rHost
         ;;
       135|137|445)
         echo -e "${GOOD}[+]${NC} $rHost RPC checks"
-        nmap -p $rPort -sV -Pn --script vulners,msrpc-enum,rpcinfo,nbstat,rpc-grind --script-timeout 5m -oN $rHost\_$rPort-$(date +%d%b).txt $rHost
+        nmap -p $rPort -sV -Pn --script vulners,msrpc-enum,rpcinfo,nbstat,rpc-grind -oN $rHost\_$rPort-$(date +%d%b).txt $rHost
         ;;
       *)
         echo -e "${ALRT}[!!]${NC} undefined port to check, please update case statement with port '$rPort' and query options"
-<<<<<<< HEAD
         echo -e "${CAUTION}[**]${NC} running version check for some generic information on port '$rPort'"
-=======
-        echo -e "${CAUTION}[**]${NC} running version check for some generic information on irregular port '$rPort'"
->>>>>>> bae886195b8afc7707ad7ffa8d517df628ec99b9
         nmap -p $rPort -sV -Pn $rHost\_$rPort-$(date +%d%b).txt $rHost
         ;;
    esac
