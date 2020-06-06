@@ -117,7 +117,7 @@ main() {
     mv --force ${torNodes} ${torNodes}.$(date +%d%b)
   fi
 
-  echo "${GOOD}[+]${RST} Completed backing up files ... downloading new files from sources..."
+  echo -e "${GOOD}[+]${RST} Completed backing up files ... downloading new files from sources..."
 
   wget --timeout=20 --quiet -O ${spamhaus} https://spamhaus.org/drop/drop.lasso 2>> ${errorlog}
   # checking file size > 0, better than simple if it exists
