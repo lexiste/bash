@@ -52,6 +52,10 @@ while IFS=' ' read line || [[ -n "$line" ]]; do
             echo -e "${ALRT}${ULINE}SEGMENTATION FAULT occured when scanning host $rHost on port $rPort.${NC}\nReview the script(s) that are executed as part of the related scan in $0"
         fi
         ;;
+      25|465|587)
+        echo -e "${GOOD}[+]${NC} $rHost SMTP checks"
+        nmap -p $rPort -sV -Pn --script vulners,smtp-brute,smtp-open-relay,smtp-enum-users -oN $rHost\_$rPort-$(date +%d%b).txt $rHost
+        ;;
       389|636)
         echo -e "${GOOD}[+]${NC} $rHost LDAP checks"
         echo -e "${ALRT}[!!]${NC} ${ULINE}${CAUTION}LDAP checking needs tuning, may not provide all information${NC}"
