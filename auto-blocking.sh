@@ -97,27 +97,28 @@ tor exit nodes : ${torNodes} [for record keeping]
 }
 
 main() {
+  echo -e "${GOOD}[+]${NC} Backup of existing feeds files ..." | tee -a ${logfile}
   if [ -f "${spamhaus}" ]; then
-    echo -e "move ${GOOD}${spamhaus}${RST} to ${GOOD}${spamhaus}.$(date +%d%b)${RST}" | tee -a ${logfile}
+    echo -e "  move ${GOOD}${spamhaus}${RST} to ${GOOD}${spamhaus}.$(date +%d%b)${RST}" | tee -a ${logfile}
     mv --force ${spamhaus} ${spamhaus}.$(date +%d%b)
   fi
 
   if [ -f "${bogons}" ]; then
-    echo -e "move ${GOOD}${bogons}${RST} to ${GOOD}${bogons}.$(date +%d%b)${RST}" | tee -a ${logfile}
+    echo -e "  move ${GOOD}${bogons}${RST} to ${GOOD}${bogons}.$(date +%d%b)${RST}" | tee -a ${logfile}
     mv --force ${bogons} ${bogons}.$(date +%d%b)
   fi
 
   if [ -f "${talos}" ]; then
-    echo -e "move ${GOOD}${talos}${RST} to ${GOOD}${talos}.$(date +%d%b)${RST}" | tee -a ${logfile}
+    echo -e "  move ${GOOD}${talos}${RST} to ${GOOD}${talos}.$(date +%d%b)${RST}" | tee -a ${logfile}
     mv --force ${talos} ${talos}.$(date +%d%b)
   fi
 
   if [ -f "${torNodes}" ]; then
-    echo -e "move ${GOOD}${torNodes}${RST} to ${GOOD}${torNodes}.$(date +%d%b)${RST}" | tee -a ${logfile}
+    echo -e "  move ${GOOD}${torNodes}${RST} to ${GOOD}${torNodes}.$(date +%d%b)${RST}" | tee -a ${logfile}
     mv --force ${torNodes} ${torNodes}.$(date +%d%b)
   fi
 
-  echo -e "${GOOD}[+]${RST} Completed backing up files ... downloading new files from sources..."
+  echo -e "\n${GOOD}[+]${RST} Completed backing up feeds files ... downloading new files from sources ..." | tee -a ${logfile}
 
   wget --timeout=20 --quiet -O ${spamhaus} https://spamhaus.org/drop/drop.lasso 2>> ${errorlog}
   # checking file size > 0, better than simple if it exists
@@ -150,7 +151,7 @@ main() {
     echo -e "${ALRT}[-]${RST} downloading ${torNodes} file" | tee -a ${logfile}
   fi
 
-  echo -e "${GOOD}[+]${RST} Completed downloading files ... processing and loading into iptables..."
+  echo -e "${GOOD}[+]${RST} Completed downloading feeds files ... processing and loading into iptables ..." | tee -a ${logfile}
 
   if [ ! -s "${spamhaus}" ]; then
      echo -e "${ALRT}[!!]${RST} unable to find drop list file ${spamhaus}" | tee -a ${logfile}
@@ -158,10 +159,10 @@ main() {
      exit 1
   else
      # convert the spamhaus file into a Cisco formated ACL file that c/would be used to update router(s)
-     echo -e "converting ${spamhaus} into ACL format files" | tee -a ${logfile}
+     echo -e "Converting ${spamhaus} into ACL format files" | tee -a ${logfile}
      cat ${spamhaus} | grep -v "^;" | awk 'BEGIN {FS=" ; "}; {print $1}' | sed -f ~/scripts/subnet2mask.sed | awk '{ print "deny ip "$1" "$2" any"}' > $spamhaus.in
      cat ${spamhaus} | grep -v "^;" | awk 'BEGIN {FS=" ; "}; {print $1}' | sed -f ~/scripts/subnet2mask.sed | awk '{ print "deny ip any "$1" "$2}' > $spamhaus.out
-     echo -e "finished processing ${spamhaus}\n" | tee -a ${logfile}
+     echo -e "Finished processing ${spamhaus}\n" | tee -a ${logfile}
   fi
 
   if [ ! -s "${bogons}" ]; then
@@ -170,9 +171,9 @@ main() {
      exit 1
   else
      # convert the bogons file into a Cisco formated ACL file that c/would be used to update router(s)
-     echo -e "converting ${bogons} into ACL format files" | tee -a ${logfile}
+     echo -e "Converting ${bogons} into ACL format files" | tee -a ${logfile}
      cat ${bogons} | grep -v "^#" | sed -f ~/scripts/subnet2mask.sed | awk '{ print "deny ip "$1" "$2" any"}' > $bogons.in
-     echo -e "finished processing ${bogons}\n" | tee -a ${logfile}
+     echo -e "Finished processing ${bogons}\n" | tee -a ${logfile}
   fi
 
   if [ ! -x /sbin/iptables ]; then
