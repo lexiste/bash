@@ -6,7 +6,7 @@ _g='\033[1;92m' # Bold light green FG / default bg
 _c='\033[33m'   # Yellow FG
 _u='\033[4m'    # Underline text
 
-if ! [ -r "$1" ]; then
+fi ! [ -r "$1" ]; then
   echo -e "${_c}[!] no file passed, or file not found${_r}"
   exit -1
 fi
