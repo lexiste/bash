@@ -92,7 +92,7 @@ main() {
 
   ## if both are online then do nothing
   if [ "${remote_state_01}" = "online" ] && [ "${remote_state_02}" = "online" ]; then
-    echo """hosts 01 & 02 are online and responding to ping check\n"""
+    echo -e """hosts 01 & 02 are online and responding to ping check\n"""
     exit ${EXIT_CODES['ok']}
   fi
 
