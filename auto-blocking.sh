@@ -50,7 +50,7 @@
 ##  error since we have `set -eu`
 ##
 
-VERSION="0.3.3"
+VERSION="0.4.10"
 
 #set -eu # exit on error or unset variables
 set -e
@@ -81,23 +81,24 @@ init() {
 
   ## redirect stdout/stderr to file
 	#exec &> ${logfile}
-}
+} ## init()
 
 header() {
   clear
   echo -e """
 ----------------------------------------
-Run Date: ${GOOD}$(date +%d-%b-%Y\ %H:%M)${RST}
-source folder  : ${folder}
-spamhaus file  : ${spamhaus}
-bogon file     : ${bogons}
-talos file     : ${talos} [for record keeping]
+      run date : ${GOOD}$(date +%d-%b-%Y\ %H:%M)${RST}
+ source folder : ${folder}
+ spamhaus file : ${spamhaus}
+    bogon file : ${bogons}
+    talos file : ${talos} [for record keeping]
 tor exit nodes : ${torNodes} [for record keeping]
 ----------------------------------------\n""" | tee -a ${logfile}
-}
+} ## header()
 
-main() {
-  echo -e "${GOOD}[+]${NC} Backup of existing feeds files ..." | tee -a ${logfile}
+backup-files() {
+  ## backup the existing feeds files for historical purpose
+  echo -e "${GOOD}[+]${RST} Backup of existing feeds files ..." | tee -a ${logfile}
   if [ -f "${spamhaus}" ]; then
     echo -e "  move ${GOOD}${spamhaus}${RST} to ${GOOD}${spamhaus}.$(date +%d%b)${RST}" | tee -a ${logfile}
     mv --force ${spamhaus} ${spamhaus}.$(date +%d%b)
@@ -118,41 +119,49 @@ main() {
     mv --force ${torNodes} ${torNodes}.$(date +%d%b)
   fi
 
-  echo -e "\n${GOOD}[+]${RST} Completed backing up feeds files ... downloading new files from sources ..." | tee -a ${logfile}
+  echo -e "${GOOD}[+]${RST} Completed backing up feeds files ... \n\n" | tee -a ${logfile}
+} ## backup-files()
+
+download-files(){
+  echo -e "${GOOD}[+]${RST} Downloading new files ..." | tee -a ${logfile}D
 
   wget --timeout=20 --quiet -O ${spamhaus} https://spamhaus.org/drop/drop.lasso 2>> ${errorlog}
   # checking file size > 0, better than simple if it exists
   if [ -s ${spamhaus} ]; then
-    echo -e "${GOOD}[+]${RST} downloading ${spamhaus} file" | tee -a ${logfile}
+    echo -e "  downloading ${spamhaus} file" | tee -a ${logfile}
   else
-    echo -e "${ALRT}[-]${RST} downloading ${spamhaus} file" | tee -a ${logfile}
+    echo -e "  ${ALRT}[-]${RST} downloading ${spamhaus} file" | tee -a ${logfile}
   fi
 
   wget --timeout=20 --quiet -O ${bogons} https://www.team-cymru.org/Services/Bogons/fullbogons-ipv4.txt 2>> ${errorlog}
   # checking file size > 0, better than simple if it exists
   if [ -s ${bogons} ]; then
-    echo -e "${GOOD}[+]${RST} downloading ${bogons} file" | tee -a ${logfile}
+    echo -e "  downloading ${bogons} file" | tee -a ${logfile}
   else
-    echo -e "${ALRT}[-]${RST} downloading ${bogons} file" | tee -a ${logfile}
+    echo -e "  ${ALRT}[-]${RST} downloading ${bogons} file" | tee -a ${logfile}
   fi
 
   wget --timeout=20 --quiet -O ${talos} https://talosintelligence.com/documents/ip-blacklist 2>> ${errorlog}
   # checking file size > 0, better than simple if it exists
   if [ -s "${talos}" ]; then
-    echo -e "${GOOD}[+]${RST} downloading ${talos} file" | tee -a ${logfile}
+    echo -e "  downloading ${talos} file" | tee -a ${logfile}
   else
-    echo -e "${ALRT}[-]${RST} downloading ${talos} file" | tee -a ${logfile}
+    echo -e "  ${ALRT}[-]${RST} downloading ${talos} file" | tee -a ${logfile}
   fi
 
   wget --quiet -O ${torNodes} https://check.torproject.org/exit-addresses 2>> ${errorlog}
   if [ -s "${torNodes}" ]; then
-    echo -e "${GOOD}[+]${RST} downloading ${torNodes} file" | tee -a ${logfile}
+    echo -e "  downloading ${torNodes} file" | tee -a ${logfile}
   else
-    echo -e "${ALRT}[-]${RST} downloading ${torNodes} file" | tee -a ${logfile}
+    echo -e "  ${ALRT}[-]${RST} downloading ${torNodes} file" | tee -a ${logfile}
   fi
 
-  echo -e "${GOOD}[+]${RST} Completed downloading feeds files ... processing and loading into iptables ..." | tee -a ${logfile}
+  echo -e "${GOOD}[+]${RST} Completed downloading feeds files ... \n\n" | tee -a ${logfile}
 
+} ## download-files()
+
+main() {
+  ## processing and loading into iptables ...
   if [ ! -s "${spamhaus}" ]; then
      echo -e "${ALRT}[!!]${RST} unable to find drop list file ${spamhaus}" | tee -a ${logfile}
      echo -e "perhaps do: wget https://spamhaus.org/drop/drop.lasso -O ${spamhaus}" | tee -a ${logfile}
@@ -196,7 +205,7 @@ main() {
   sudo /sbin/iptables -X
 
   ## looks like we have the input file and iptables located
-  echo -e "${GOOD}loading${RST} $spamhaus into iptables..." | tee -a ${logfile}
+  echo -e "${GOOD}[+]${RST} loading $spamhaus into iptables..." | tee -a ${logfile}
   cat "${spamhaus}" \
    | sed -e 's/;.*//' \
    | grep -v '^ *$' \
@@ -210,4 +219,6 @@ main() {
 
 init
 header
+backup-files
+download-files
 main
