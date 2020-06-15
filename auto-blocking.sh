@@ -50,10 +50,9 @@
 ##  error since we have `set -eu`
 ##
 
-VERSION="0.4.10"
+VERSION="0.5.0"
 
-#set -eu # exit on error or unset variables
-set -e
+set -eu # exit on error or unset variables
 
 folder=~/blackhole
 logfile="${folder}/blackhole.log"
@@ -63,20 +62,21 @@ bogons="${folder}/bogons-ipv4"
 talos="${folder}/talos-ioc"
 torNodes="${folder}/tor-exit-nodes"
 
-RST='\e[0m' #reset
-ALRT='\e[97m\e[41m' #white fg / red bg
-GOOD='\e[92m' #green fg / no bg (default)
+coltable="./COL_TABLE"
+if [[ -f ${coltable} ]]; then
+  source ${coltable}
+fi
 
 init() {
 	# check if the base folder exists, create if not
   if [ ! -d "${folder}" ]; then
-     echo -e "${ALRT}[!!] Creating folder ${folder}${RST}" | tee -a ${logfile}
+     echo -e "${COL_URG_RED}${CROSS} Creating folder ${folder}${COL_NC}" | tee -a ${logfile}
      mkdir -p ${folder}
   fi
 	# check for log file to write to, create if not
 	if [ ! -f "${logfile}" ]; then
 		touch ${logfile}
-    echo -e "[${GOOD}+${RST}] created ${logfile}"
+    echo -e "[${COL_LIGHT_GREEN}${TICK}${COL_NC}] created ${logfile}"
 	fi
 
   ## redirect stdout/stderr to file
@@ -87,7 +87,7 @@ header() {
   clear
   echo -e """
 ----------------------------------------
-      run date : ${GOOD}$(date +%d-%b-%Y\ %H:%M)${RST}
+      run date : ${COL_LIGHT_GREEN}$(date +%d-%b-%Y\ %H:%M)${COL_NC}
  source folder : ${folder}
  spamhaus file : ${spamhaus}
     bogon file : ${bogons}
@@ -98,39 +98,39 @@ tor exit nodes : ${torNodes} [for record keeping]
 
 backup-files() {
   ## backup the existing feeds files for historical purpose
-  echo -e "${GOOD}[+]${RST} Backup of existing feeds files ..." | tee -a ${logfile}
+  echo -e "${COL_LIGHT_GREEN}${TICK}${COL_NC} Backup of existing feeds files ..." | tee -a ${logfile}
   if [ -f "${spamhaus}" ]; then
-    echo -e "  move ${GOOD}${spamhaus}${RST} to ${GOOD}${spamhaus}.$(date +%d%b)${RST}" | tee -a ${logfile}
+    echo -e "  move ${COL_LIGHT_GREEN}${spamhaus}${COL_NC} to ${COL_LIGHT_GREEN}${spamhaus}.$(date +%d%b)${COL_NC}" | tee -a ${logfile}
     mv --force ${spamhaus} ${spamhaus}.$(date +%d%b)
   fi
 
   if [ -f "${bogons}" ]; then
-    echo -e "  move ${GOOD}${bogons}${RST} to ${GOOD}${bogons}.$(date +%d%b)${RST}" | tee -a ${logfile}
+    echo -e "  move ${COL_LIGHT_GREEN}${bogons}${COL_NC} to ${COL_LIGHT_GREEN}${bogons}.$(date +%d%b)${COL_NC}" | tee -a ${logfile}
     mv --force ${bogons} ${bogons}.$(date +%d%b)
   fi
 
   if [ -f "${talos}" ]; then
-    echo -e "  move ${GOOD}${talos}${RST} to ${GOOD}${talos}.$(date +%d%b)${RST}" | tee -a ${logfile}
+    echo -e "  move ${COL_LIGHT_GREEN}${talos}${COL_NC} to ${COL_LIGHT_GREEN}${talos}.$(date +%d%b)${COL_NC}" | tee -a ${logfile}
     mv --force ${talos} ${talos}.$(date +%d%b)
   fi
 
   if [ -f "${torNodes}" ]; then
-    echo -e "  move ${GOOD}${torNodes}${RST} to ${GOOD}${torNodes}.$(date +%d%b)${RST}" | tee -a ${logfile}
+    echo -e "  move ${COL_LIGHT_GREEN}${torNodes}${COL_NC} to ${COL_LIGHT_GREEN}${torNodes}.$(date +%d%b)${COL_NC}" | tee -a ${logfile}
     mv --force ${torNodes} ${torNodes}.$(date +%d%b)
   fi
 
-  echo -e "${GOOD}[+]${RST} Completed backing up feeds files ... \n\n" | tee -a ${logfile}
+  echo -e "${TICK} Completed backing up feeds files ... \n\n" | tee -a ${logfile}
 } ## backup-files()
 
 download-files(){
-  echo -e "${GOOD}[+]${RST} Downloading new files ..." | tee -a ${logfile}D
+  echo -e "${TICK} Downloading new files ..." | tee -a ${logfile}D
 
   wget --timeout=20 --quiet -O ${spamhaus} https://spamhaus.org/drop/drop.lasso 2>> ${errorlog}
   # checking file size > 0, better than simple if it exists
   if [ -s ${spamhaus} ]; then
     echo -e "  downloading ${spamhaus} file" | tee -a ${logfile}
   else
-    echo -e "  ${ALRT}[-]${RST} downloading ${spamhaus} file" | tee -a ${logfile}
+    echo -e "  ${CROSS} downloading ${spamhaus} file" | tee -a ${logfile}
   fi
 
   wget --timeout=20 --quiet -O ${bogons} https://www.team-cymru.org/Services/Bogons/fullbogons-ipv4.txt 2>> ${errorlog}
@@ -138,7 +138,7 @@ download-files(){
   if [ -s ${bogons} ]; then
     echo -e "  downloading ${bogons} file" | tee -a ${logfile}
   else
-    echo -e "  ${ALRT}[-]${RST} downloading ${bogons} file" | tee -a ${logfile}
+    echo -e "  ${CROSS} downloading ${bogons} file" | tee -a ${logfile}
   fi
 
   wget --timeout=20 --quiet -O ${talos} https://talosintelligence.com/documents/ip-blacklist 2>> ${errorlog}
@@ -146,24 +146,24 @@ download-files(){
   if [ -s "${talos}" ]; then
     echo -e "  downloading ${talos} file" | tee -a ${logfile}
   else
-    echo -e "  ${ALRT}[-]${RST} downloading ${talos} file" | tee -a ${logfile}
+    echo -e "  ${CROSS} downloading ${talos} file" | tee -a ${logfile}
   fi
 
   wget --quiet -O ${torNodes} https://check.torproject.org/exit-addresses 2>> ${errorlog}
   if [ -s "${torNodes}" ]; then
     echo -e "  downloading ${torNodes} file" | tee -a ${logfile}
   else
-    echo -e "  ${ALRT}[-]${RST} downloading ${torNodes} file" | tee -a ${logfile}
+    echo -e "  ${CROSS} downloading ${torNodes} file" | tee -a ${logfile}
   fi
 
-  echo -e "${GOOD}[+]${RST} Completed downloading feeds files ... \n\n" | tee -a ${logfile}
+  echo -e "${TICK} Completed downloading feeds files ... \n\n" | tee -a ${logfile}
 
 } ## download-files()
 
 main() {
   ## processing and loading into iptables ...
   if [ ! -s "${spamhaus}" ]; then
-     echo -e "${ALRT}[!!]${RST} unable to find drop list file ${spamhaus}" | tee -a ${logfile}
+     echo -e "${CROSS} unable to find drop list file ${spamhaus}" | tee -a ${logfile}
      echo -e "perhaps do: wget https://spamhaus.org/drop/drop.lasso -O ${spamhaus}" | tee -a ${logfile}
      exit 1
   else
@@ -175,7 +175,7 @@ main() {
   fi
 
   if [ ! -s "${bogons}" ]; then
-     echo -e "${ALRT}[!!]${RST} unable to find the bogons file $bogons" | tee -a ${logfile}
+     echo -e "${CROSS} unable to find the bogons file $bogons" | tee -a ${logfile}
      echo -e "perhaps a visit to https://www.team-cymru.org/Services/Bogons/fullbogons-ipv4.txt" | tee -a ${logfile}
      exit 1
   else
@@ -186,16 +186,16 @@ main() {
   fi
 
   if [ ! -x /sbin/iptables ]; then
-     echo -e "${ALRT}[!!]${RST} missing iptables command line tool, exiting" | tee -a ${logfile}
+     echo -e "${CROSS} missing iptables command line tool, exiting" | tee -a ${logfile}
      exit 1
   fi
 
-  ## first, delete all rules, delete any chains and reset to "accept all"
+  ## finally, delete all rules, delete any chains and reset to "accept all"
   ##  this is semi-dangerous since anything other than spamhuas will be reloaded
   ##  in a prod world creating a backup, or configuration of other needed (ie. required)
   ##  rules would be in another file to be loaded as well
   ##  (EX: block telnet in/out, whitelist known hosts, etc.)
-  echo -e "${ALRT}[!!]${RST} purging previous iptables rules..." | tee -a ${logfile}
+  echo -e "${CROSS} purging previous iptables rules..." | tee -a ${logfile}
   sudo /sbin/iptables -P INPUT ACCEPT
   sudo /sbin/iptables -P FORWARD ACCEPT
   sudo /sbin/iptables -P OUTPUT ACCEPT
@@ -205,7 +205,7 @@ main() {
   sudo /sbin/iptables -X
 
   ## looks like we have the input file and iptables located
-  echo -e "${GOOD}[+]${RST} loading $spamhaus into iptables..." | tee -a ${logfile}
+  echo -e "${TICK} loading $spamhaus into iptables..." | tee -a ${logfile}
   cat "${spamhaus}" \
    | sed -e 's/;.*//' \
    | grep -v '^ *$' \
@@ -215,6 +215,7 @@ main() {
      sudo /sbin/iptables -I FORWARD -s "$singleBlock" -j DROP
      sudo /sbin/iptables -I FORWARD -d "$singleBlock" -j DROP
   done
+  echo -e "${DONE}"
 }
 
 init
