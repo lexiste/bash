@@ -1,14 +1,13 @@
 #!/usr/bin/env bash
 
-_r='\033[0m'    # reset
-_a='\033[1;91m' # Bold light Red FG / default bg
-_g='\033[1;92m' # Bold light green FG / default bg
-_c='\033[33m'   # Yellow FG
-_u='\033[4m'    # Underline text
+declare coltable="./COL_TABLE"
+if [[ -f ${coltable} ]]; then
+  source ${coltable}
+fi
 
 if ! [ -r "$1" ]
 then
-  echo -e "${_c}[!] no file named passed or file not found${_r}"
+  echo -e "${CROSS} no file named passed or file not found"
   exit 1
 fi
 
@@ -18,8 +17,9 @@ do
   if [ $? -eq 0 ]
   then
     ip=$(nslookup $host | awk -F": " '/Address/{print $2}' | tr '\n' ' ')
-    echo -e "${_g}[+]${_r} ${host} ${ip} up"
+    echo -e "${CROSS} ${host} ${ip} up"
   else
-    echo -e "${_a}[!]${_r} ${host} ${_c}down${_r}"
+    echo -e "${TICK} ${host} down$"
   fi
 done # cat ...
+echo -e "${DONE}"

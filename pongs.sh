@@ -1,17 +1,16 @@
 #!/usr/bin/env bash
 
-_r='\033[0m'    # reset
-_a='\033[1;91m' # Bold light Red FG / default bg
-_g='\033[1;92m' # Bold light green FG / default bg
-_c='\033[33m'   # Yellow FG
-_u='\033[4m'    # Underline text
+coltable="./COL_TABLE"
+if [[ -f ${coltable} ]]; then
+  source ${coltable}
+fi
 
-fi ! [ -r "$1" ]; then
-  echo -e "${_c}[!] no file passed, or file not found${_r}"
+if ! [ -r "$1" ]; then
+  echo -e "${CROSS} no file passed, or file not found"
   exit -1
 fi
 
-domains=("gspt.net" "gsiccorp.net" "innotrac.com" "prd.gsi.local" "us.gspt.net")
+declare domains=("gspt.net" "gsiccorp.net" "innotrac.com" "prd.gsi.local" "us.gspt.net")
 
 while read name; do
   ## when importing a file from windows, we need to trim the trailing line feed
@@ -32,3 +31,4 @@ while read name; do
     fi
   done
 done < "$1"
+echo -e "${DONE}"

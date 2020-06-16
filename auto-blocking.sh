@@ -54,15 +54,15 @@ VERSION="0.5.0"
 
 set -eu # exit on error or unset variables
 
-folder=~/blackhole
-logfile="${folder}/blackhole.log"
-errorlog="${folder}/blackhole.err"
-spamhaus="${folder}/spamhaus-drop"
-bogons="${folder}/bogons-ipv4"
-talos="${folder}/talos-ioc"
-torNodes="${folder}/tor-exit-nodes"
+readonly folder=~/blackhole
+readonly logfile="${folder}/blackhole.log"
+readonly errorlog="${folder}/blackhole.err"
+readonly spamhaus="${folder}/spamhaus-drop"
+readonly bogons="${folder}/bogons-ipv4"
+readonly talos="${folder}/talos-ioc"
+readonly torNodes="${folder}/tor-exit-nodes"
 
-coltable="./COL_TABLE"
+coltable="/home/todd/scripts/bash/COL_TABLE"
 if [[ -f ${coltable} ]]; then
   source ${coltable}
 fi

@@ -8,13 +8,13 @@
 ##########################################################################
 # Program: <APPLICATION DESCRIPTION HERE>
 ##########################################################################
-VERSION="0.0.1"; # <release>.<major change>.<minor change>
-PROGNAME="<APPLICATION NAME>";
-AUTHOR="todd fencl";
-__dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-__file="${__dir}/$(basename "${BASH_SOURCE[0]}")"
-__base="$(basename ${__file} .sh)"
-__root="$(cd "$(dirname "${__dir}")" && pwd)" # <-- change this as it depends on your app
+readonly VERSION="0.0.1"; # <release>.<major change>.<minor change>
+readonly PROGNAME="<APPLICATION NAME>";
+readonly AUTHOR="todd fencl";
+readonly __dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+readonly __file="${__dir}/$(basename "${BASH_SOURCE[0]}")"
+readonly __base="$(basename ${__file} .sh)"
+readonly __root="$(cd "$(dirname "${__dir}")" && pwd)" # <-- change this as it depends on your app
 
 ##########################################################################
 ## Pipeline:
@@ -23,36 +23,17 @@ __root="$(cd "$(dirname "${__dir}")" && pwd)" # <-- change this as it depends on
 
 ##########################################################################
 # XXX: Coloured variables
-#  https://misc.flogisoft.com/bash/tip_colors_and_formatting
-#  fg, bg and format can be chained together like
-#  ${bold}${uline}${red}My Name is${normal}${yellow}${blink}Fred${normal}
 ##########################################################################
-## foreground colors
-red=`echo -e "\033[31m"`
-green=`echo -e "\033[32m"`
-yellow=`echo -e "\033[33m"`
-blue=`echo -e "\033[34m"`
-purple=`echo -e "\033[35m"`
-lt_red=`echo -e "\033[91m"`
-lt_green=`echo -e "\033[92m"`
+coltable="/home/todd/scripts/bash/COL_TABLE"
+if [[ -f ${coltable} ]]; then
+  source ${coltable}
+fi
 
-## background colors .. don't need many
-bg_normal=`echo -e "\033[49m"`
-bg_red=`echo -e "\033[41m"`
-bg_green=`echo -e "\033[42m"`
-
-## text setting
-normal=`echo -e "\033[0m"`
-bold=`echo -e "\033[1m"`
-uline=`echo -e "\033[4m"`
-blink=`echo -e "\033[5m"`
-hide=`echo -e "\033[8m"`
 ##########################################################################
 # XXX: Configuration
 ##########################################################################
 
 declare -A EXIT_CODES
-
 EXIT_CODES['unknown']=-1
 EXIT_CODES['ok']=0
 EXIT_CODES['generic']=1
@@ -60,7 +41,7 @@ EXIT_CODES['limit']=3
 EXIT_CODES['missing']=5
 EXIT_CODES['failure']=10
 
-DEBUG=0
+local DEBUG=0
 param=""
 
 ##########################################################################
@@ -79,7 +60,7 @@ show_usage() {
 }
 
 show_version() {
-  echo "${green}${PROGNAME}${normal} ${yellow}version: ${VERSION}${normal} (${AUTHOR})";
+  echo "${COL_GREEN}${PROGNAME}${COL_NC} ${COL_YELLOW}version: ${VERSION}${COL_NC} (${AUTHOR})";
   exit ${EXIT_CODES['ok']};
 }
 
@@ -137,6 +118,8 @@ main() {
 #start coding here
   echo "start coding here"
   echo "value of -x is $2"
+
+  echo -e "${DONE}"
 }
 
 header
