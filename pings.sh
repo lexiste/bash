@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-declare coltable="./COL_TABLE"
+declare coltable="/home/todd/scripts/bash/COL_TABLE"
 if [[ -f ${coltable} ]]; then
   source ${coltable}
 fi
@@ -17,9 +17,9 @@ do
   if [ $? -eq 0 ]
   then
     ip=$(nslookup $host | awk -F": " '/Address/{print $2}' | tr '\n' ' ')
-    echo -e "${CROSS} ${host} ${ip} up"
+    echo -e "${TICK} ${host} ${ip} up"
   else
-    echo -e "${TICK} ${host} down$"
+    echo -e "${CROSS} ${host} down"
   fi
 done # cat ...
 echo -e "${DONE}"

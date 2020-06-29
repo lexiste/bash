@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-declare coltable="./COL_TABLE"
+declare coltable="/home/todd/scripts/bash/COL_TABLE"
 if [[ -f ${coltable} ]]; then
   source ${coltable}
 fi
@@ -11,7 +11,7 @@ then
   exit -1
 fi
 
-echo -e "dig'ing testing $1 ...\n\n"
+echo -e "dig'ing for $1 ...\n\n"
 
 cat "$1" | while read line
 do
@@ -19,3 +19,4 @@ do
   echo -n "$(dig +short "$line" @kopprddc01.gsiccorp.net)"
   echo
 done
+echo -e "${DONE}"

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-coltable="./COL_TABLE"
+declare coltable="/home/todd/scripts/bash/COL_TABLE"
 if [[ -f ${coltable} ]]; then
   source ${coltable}
 fi
