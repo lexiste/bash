@@ -62,12 +62,13 @@ readonly bogons="${folder}/bogons-ipv4"
 readonly talos="${folder}/talos-ioc"
 readonly torNodes="${folder}/tor-exit-nodes"
 
-coltable="/home/todd/scripts/bash/COL_TABLE"
-if [[ -f ${coltable} ]]; then
-  source ${coltable}
-fi
-
 init() {
+  # check and load our file with colors and some "icons" for output
+  coltable="/home/todd/scripts/bash/COL_TABLE"
+  if [[ -f ${coltable} ]]; then
+    source ${coltable}
+  fi
+
 	# check if the base folder exists, create if not
   if [ ! -d "${folder}" ]; then
      echo -e "${COL_URG_RED}${CROSS} Creating folder ${folder}${COL_NC}" | tee -a ${logfile}
@@ -79,13 +80,11 @@ init() {
     echo -e "[${COL_LIGHT_GREEN}${TICK}${COL_NC}] created ${logfile}"
 	fi
 
-  ## redirect stdout/stderr to file
-	#exec &> ${logfile}
 } ## init()
 
 header() {
   clear
-  echo -e """
+  echo -e """${COL_NC}
 ----------------------------------------
       run date : ${COL_LIGHT_GREEN}$(date +%d-%b-%Y\ %H:%M)${COL_NC}
  source folder : ${folder}
@@ -98,7 +97,7 @@ tor exit nodes : ${torNodes} [for record keeping]
 
 backup-files() {
   ## backup the existing feeds files for historical purpose
-  echo -e "${COL_LIGHT_GREEN}${TICK}${COL_NC} Backup of existing feeds files ..." | tee -a ${logfile}
+  echo -e "${TICK} Backup of existing feeds files ..." | tee -a ${logfile}
   if [ -f "${spamhaus}" ]; then
     echo -e "  move ${COL_LIGHT_GREEN}${spamhaus}${COL_NC} to ${COL_LIGHT_GREEN}${spamhaus}.$(date +%d%b)${COL_NC}" | tee -a ${logfile}
     mv --force ${spamhaus} ${spamhaus}.$(date +%d%b)
@@ -123,9 +122,9 @@ backup-files() {
 } ## backup-files()
 
 download-files(){
-  echo -e "${TICK} Downloading new files ..." | tee -a ${logfile}D
+  echo -e "${TICK} Downloading new files ..." | tee -a ${logfile}
 
-  wget --timeout=20 --quiet -O ${spamhaus} https://spamhaus.org/drop/drop.lasso 2>> ${errorlog}
+  wget --timeout=20 --quiet -O ${spamhaus} https://spamhaus.org/drop/drop.lasso | tee -a ${errorlog}
   # checking file size > 0, better than simple if it exists
   if [ -s ${spamhaus} ]; then
     echo -e "  downloading ${spamhaus} file" | tee -a ${logfile}
@@ -133,7 +132,7 @@ download-files(){
     echo -e "  ${CROSS} downloading ${spamhaus} file" | tee -a ${logfile}
   fi
 
-  wget --timeout=20 --quiet -O ${bogons} https://www.team-cymru.org/Services/Bogons/fullbogons-ipv4.txt 2>> ${errorlog}
+  wget --timeout=20 --quiet -O ${bogons} https://www.team-cymru.org/Services/Bogons/fullbogons-ipv4.txt | tee -a ${errorlog}
   # checking file size > 0, better than simple if it exists
   if [ -s ${bogons} ]; then
     echo -e "  downloading ${bogons} file" | tee -a ${logfile}
@@ -141,7 +140,7 @@ download-files(){
     echo -e "  ${CROSS} downloading ${bogons} file" | tee -a ${logfile}
   fi
 
-  wget --timeout=20 --quiet -O ${talos} https://talosintelligence.com/documents/ip-blacklist 2>> ${errorlog}
+  wget --quiet -O ${talos} https://talosintelligence.com/documents/ip-blacklist | tee -a ${errorlog}
   # checking file size > 0, better than simple if it exists
   if [ -s "${talos}" ]; then
     echo -e "  downloading ${talos} file" | tee -a ${logfile}
@@ -149,7 +148,7 @@ download-files(){
     echo -e "  ${CROSS} downloading ${talos} file" | tee -a ${logfile}
   fi
 
-  wget --quiet -O ${torNodes} https://check.torproject.org/exit-addresses 2>> ${errorlog}
+  wget --quiet -O ${torNodes} https://check.torproject.org/exit-addresses | tee -a ${errorlog}
   if [ -s "${torNodes}" ]; then
     echo -e "  downloading ${torNodes} file" | tee -a ${logfile}
   else
