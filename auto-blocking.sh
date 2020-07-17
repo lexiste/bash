@@ -87,6 +87,7 @@ header() {
   echo -e """${COL_NC}
 ----------------------------------------
       run date : ${COL_LIGHT_GREEN}$(date +%d-%b-%Y\ %H:%M)${COL_NC}
+       version : ${VERSION}
  source folder : ${folder}
  spamhaus file : ${spamhaus}
     bogon file : ${bogons}
@@ -100,28 +101,28 @@ backup-files() {
   echo -e "${TICK} Backup of existing feeds files ..." | tee -a ${logfile}
   if [ -f "${spamhaus}" ]; then
     echo -e "  move ${COL_LIGHT_GREEN}${spamhaus}${COL_NC} to ${COL_LIGHT_GREEN}${spamhaus}.$(date +%d%b)${COL_NC}" | tee -a ${logfile}
-    mv --force ${spamhaus} ${spamhaus}.$(date +%d%b)
+    mv --force ${spamhaus} ${spamhaus}."$(date +%d%b)"
   fi
 
   if [ -f "${bogons}" ]; then
     echo -e "  move ${COL_LIGHT_GREEN}${bogons}${COL_NC} to ${COL_LIGHT_GREEN}${bogons}.$(date +%d%b)${COL_NC}" | tee -a ${logfile}
-    mv --force ${bogons} ${bogons}.$(date +%d%b)
+    mv --force ${bogons} ${bogons}."$(date +%d%b)"
   fi
 
   if [ -f "${talos}" ]; then
     echo -e "  move ${COL_LIGHT_GREEN}${talos}${COL_NC} to ${COL_LIGHT_GREEN}${talos}.$(date +%d%b)${COL_NC}" | tee -a ${logfile}
-    mv --force ${talos} ${talos}.$(date +%d%b)
+    mv --force ${talos} ${talos}."$(date +%d%b)"
   fi
 
   if [ -f "${torNodes}" ]; then
     echo -e "  move ${COL_LIGHT_GREEN}${torNodes}${COL_NC} to ${COL_LIGHT_GREEN}${torNodes}.$(date +%d%b)${COL_NC}" | tee -a ${logfile}
-    mv --force ${torNodes} ${torNodes}.$(date +%d%b)
+    mv --force ${torNodes} ${torNodes}."$(date +%d%b)"
   fi
 
   echo -e "${TICK} Completed backing up feeds files ... \n\n" | tee -a ${logfile}
 } ## backup-files()
 
-download-files(){
+download-files() {
   echo -e "${TICK} Downloading new files ..." | tee -a ${logfile}
 
   wget --timeout=20 --quiet -O ${spamhaus} https://spamhaus.org/drop/drop.lasso | tee -a ${errorlog}
