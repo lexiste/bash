@@ -84,7 +84,7 @@ init() {
 
 header() {
   clear
-  echo -e """${COL_NC}
+  echo -e "${COL_NC}
 ----------------------------------------
       run date : ${COL_LIGHT_GREEN}$(date +%d-%b-%Y\ %H:%M)${COL_NC}
        version : ${VERSION}
@@ -93,7 +93,7 @@ header() {
     bogon file : ${bogons}
     talos file : ${talos} [for record keeping]
 tor exit nodes : ${torNodes} [for record keeping]
-----------------------------------------\n""" | tee -a ${logfile}
+----------------------------------------\n" | tee -a ${logfile}
 } ## header()
 
 backup-files() {
