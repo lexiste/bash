@@ -24,8 +24,8 @@ declare _TARGET_IP
 declare _TARGET
 
 show_usage() {
-  echo -e """Setup HTB folder and update the hosts file.
-  Usage: $0 -t target -a ip_address"""
+  echo -e "\nSetup HTB folder and update the hosts file.
+  Usage: $0 -t target -a ip_address\n"
   exit ${EXIT_CODES['ok']};
 }
 
@@ -59,7 +59,7 @@ elif [[ -z ${_TARGET_IP+x} ]]; then
 fi
 
 ## check if the IP already exists; update the /etc/hosts file if not
-_EXISTS="$(/usr/bin/grep ${_TARGET_IP} /etc/hosts | /usr/bin/wc -m)"
+_EXISTS="$(/usr/bin/grep "${_TARGET_IP}" /etc/hosts | /usr/bin/wc -m)"
 if [[ "${_EXISTS}" -gt "0" ]]; then
   echo -e "${CROSS} IP ${_TARGET_IP} already exists in /etc/hosts"
   exit ${EXIT_CODES['duplicate']};
@@ -69,9 +69,8 @@ else
 fi
 
 ## check if the target directory already exists; create if not
-if ! [[ -d ~/learning/htb/htb-${_TARGET} ]]; then
-  mkdir ~/learning/htb/htb-${_TARGET}
-  if [[ $? -eq 0 ]]; then
+if ! [[ -d ~/learning/htb/htb-"${_TARGET}" ]]; then
+  if ! mkdir ~/learning/htb/htb-"${_TARGET}"; then
     echo -e "${TICK} htb-${_TARGET} created successfully"
   else
     echo -e "${CROSS} error occured in mkdir call"
