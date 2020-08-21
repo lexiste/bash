@@ -71,13 +71,13 @@ init() {
 
 	# check if the base folder exists, create if not
   if [ ! -d "${folder}" ]; then
-     echo -e "${COL_URG_RED}${CROSS} Creating folder ${folder}${COL_NC}" | tee -a ${logfile}
+     echo -e "${CROSS} Creating folder ${folder}"
      mkdir -p ${folder}
   fi
 	# check for log file to write to, create if not
 	if [ ! -f "${logfile}" ]; then
 		touch ${logfile}
-    echo -e "[${COL_LIGHT_GREEN}${TICK}${COL_NC}] created ${logfile}"
+    echo -e "${TICK} created ${logfile}"
 	fi
 
 } ## init()
