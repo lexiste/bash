@@ -61,6 +61,7 @@ readonly spamhaus="${folder}/spamhaus-drop"
 readonly bogons="${folder}/bogons-ipv4"
 readonly talos="${folder}/talos-ioc"
 readonly torNodes="${folder}/tor-exit-nodes"
+readonly sedFilter="/home/todd/scripts/subnet2mask.sed"
 
 init() {
   # check and load our file with colors and some "icons" for output
@@ -70,16 +71,20 @@ init() {
   fi
 
 	# check if the base folder exists, create if not
-  if [ ! -d "${folder}" ]; then
-     echo -e "${CROSS} Creating folder ${folder}"
-     mkdir -p ${folder}
-  fi
+	if [ ! -d "${folder}" ]; then
+		echo -e "${CROSS} Creating folder ${folder}"
+		mkdir -p ${folder}
+	fi
 	# check for log file to write to, create if not
 	if [ ! -f "${logfile}" ]; then
 		touch ${logfile}
-    echo -e "${TICK} created ${logfile}"
+		echo -e "${TICK} created ${logfile}"
 	fi
 
+  if [ ! -f "${sedFilter}" ]; then
+    echo -e "${CROSS} Missing subnet masking file: ${sedFilter}"
+    exit 1
+  fi
 } ## init()
 
 header() {
@@ -169,8 +174,8 @@ main() {
   else
      # convert the spamhaus file into a Cisco formated ACL file that c/would be used to update router(s)
      echo -e "Converting ${spamhaus} into ACL format files" | tee -a ${logfile}
-     cat ${spamhaus} | grep -v "^;" | awk 'BEGIN {FS=" ; "}; {print $1}' | sed -f ~/scripts/subnet2mask.sed | awk '{ print "deny ip "$1" "$2" any"}' > $spamhaus.in
-     cat ${spamhaus} | grep -v "^;" | awk 'BEGIN {FS=" ; "}; {print $1}' | sed -f ~/scripts/subnet2mask.sed | awk '{ print "deny ip any "$1" "$2}' > $spamhaus.out
+     cat ${spamhaus} | grep -v "^;" | awk 'BEGIN {FS=" ; "}; {print $1}' | sed -f ${sedFilter} | awk '{ print "deny ip "$1" "$2" any"}' > $spamhaus.in
+     cat ${spamhaus} | grep -v "^;" | awk 'BEGIN {FS=" ; "}; {print $1}' | sed -f ${sedFilter} | awk '{ print "deny ip any "$1" "$2}' > $spamhaus.out
      echo -e "Finished processing ${spamhaus}\n" | tee -a ${logfile}
   fi
 
@@ -181,7 +186,7 @@ main() {
   else
      # convert the bogons file into a Cisco formated ACL file that c/would be used to update router(s)
      echo -e "Converting ${bogons} into ACL format files" | tee -a ${logfile}
-     cat ${bogons} | grep -v "^#" | sed -f ~/scripts/subnet2mask.sed | awk '{ print "deny ip "$1" "$2" any"}' > $bogons.in
+     cat ${bogons} | grep -v "^#" | sed -f ${sedFilter} | awk '{ print "deny ip "$1" "$2" any"}' > $bogons.in
      echo -e "Finished processing ${bogons}\n" | tee -a ${logfile}
   fi
 

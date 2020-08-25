@@ -70,7 +70,7 @@ fi
 
 ## check if the target directory already exists; create if not
 if ! [[ -d ~/learning/htb/htb-"${_TARGET}" ]]; then
-  if ! mkdir ~/learning/htb/htb-"${_TARGET}"; then
+  if ! mkdir -p ~/learning/htb/htb-"${_TARGET}"; then
     echo -e "${TICK} htb-${_TARGET} created successfully"
   else
     echo -e "${CROSS} error occured in mkdir call"
