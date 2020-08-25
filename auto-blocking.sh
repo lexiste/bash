@@ -50,7 +50,7 @@
 ##  error since we have `set -eu`
 ##
 
-VERSION="0.5.0"
+VERSION="0.5.1"
 
 set -eu # exit on error or unset variables
 
@@ -62,10 +62,10 @@ readonly bogons="${folder}/bogons-ipv4"
 readonly talos="${folder}/talos-ioc"
 readonly torNodes="${folder}/tor-exit-nodes"
 readonly sedFilter="/home/todd/scripts/subnet2mask.sed"
+readonly coltable="/home/todd/scripts/bash/COL_TABLE"
 
 init() {
   # check and load our file with colors and some "icons" for output
-  coltable="/home/todd/scripts/bash/COL_TABLE"
   if [[ -f ${coltable} ]]; then
     source ${coltable}
   fi
