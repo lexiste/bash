@@ -82,7 +82,7 @@ while IFS=' ' read line || [[ -n "$line" ]]; do
       *)
         echo -e "${CROSS} undefined port to check, please update case statement with port '$rPort' and query options"
         echo -e "${COL_YELLOW}[**]${COL_NC} running version check for some generic information on port '$rPort'"
-        nmap -v0 -p $rPort -sV -Pn $rHost\_$rPort-$(date +%d%b).txt $rHost
+        nmap -v0 -p $rPort -sV -Pn -oN $rHost\_$rPort-$(date +%d%b).txt $rHost
         ;;
    esac
 
