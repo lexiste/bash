@@ -221,7 +221,7 @@ main() {
      sudo /sbin/iptables -I FORWARD -d "$singleBlock" -j DROP
   done
   echo -e "${DONE}"
-}
+}  ## main()
 
 init
 header

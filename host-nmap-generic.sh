@@ -9,6 +9,8 @@
 #     easier to determine run-time issues and review output
 #  -] need to work on case statement for unknown port scanning, doesn't appear to be working properly
 #
+# 2021Jan08 -
+#  +] changed ftp scripts to execute
 #
 
 readonly coltable="/home/todd/scripts/bash/COL_TABLE"
@@ -32,8 +34,8 @@ while IFS=' ' read line || [[ -n "$line" ]]; do
    case $rPort in
       20|21|989|990)
         echo -e "${TICK} $rHost:$rPort FTP/SFTP/FTPS checks"
-        nmap -v0 -p $rPort -sV -Pn --script vulners,ftp* --script-timeout 1m -oN $rHost\_$rPort-$(date +%d%b).txt  $rHost
-        ;;
+        nmap -v0 -p $rPort -sV -Pn --script vulners,ftp-anon,ftp-bounce,ftp-syst,ftp-vsftpd-backdoor,ftp-proftpd-backdoor --script-timeout 1m -oN $rHost\_$rPort-$(date +%d%b).txt  $rHost
+       ;;
       22)
         echo -e "${TICK} $rHost:$rPort SSH checks"
         nmap -v0 -p $rPort -sV -Pn --script vulners,ssh2-enum-algos,default --script-timeout 1m -oN $rHost\_$rPort-$(date +%d%b).txt $rHost
@@ -80,7 +82,8 @@ while IFS=' ' read line || [[ -n "$line" ]]; do
         nmap -v0 -p $rPort -sV -Pn --script vulners,msrpc-enum,rpcinfo,nbstat,rpc-grind -oN $rHost\_$rPort-$(date +%d%b).txt $rHost
         ;;
       *)
-        echo -e "${CROSS} undefined port to check, please update case statement with port '$rPort' and query options"
+        rPort="22,25,80,443"
+        echo -e "${COL_YELLOW}${CROSS}${COL_NC} undefined port[s] to check, please update case statement as needed for specific query options"
         echo -e "${COL_YELLOW}[**]${COL_NC} running version check for some generic information on port '$rPort'"
         nmap -v0 -p $rPort -sV -Pn -oN $rHost\_$rPort-$(date +%d%b).txt $rHost
         ;;
