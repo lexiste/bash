@@ -81,6 +81,10 @@ while IFS=' ' read line || [[ -n "$line" ]]; do
         echo -e "${TICK} $rHost:$rPort RPC checks"
         nmap -v0 -p $rPort -sV -Pn --script vulners,msrpc-enum,rpcinfo,nbstat,rpc-grind -oN $rHost\_$rPort-$(date +%d%b).txt $rHost
         ;;
+      161)
+         echo -e "${TICK} $rHost:$rPort SNMP checks"
+         nmap -v0 -sU -p $rPort -sV -Pn --script snmp-brute,snmp-info,snmp-interfaces,snmp-sysdescr,snmp-win32-shares,snmp-netstat -oN $rHost\_$rPort-$(date +%d%b).txt $rHost
+         ;;
       *)
         rPort="22,25,80,443"
         echo -e "${COL_YELLOW}${CROSS}${COL_NC} undefined port[s] to check, please update case statement as needed for specific query options"
