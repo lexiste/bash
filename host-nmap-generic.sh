@@ -87,6 +87,10 @@ while IFS=' ' read line || [[ -n "$line" ]]; do
         echo -e "${TICK} $rHost:$rPort NetBackup - Network Data Management Protocol checks"
         nmap -v0 -p $rPort -sV --script ndmp-fs-info,ndmp-serverinfo,ndmp-version -oN $rHost\_$rPort-$(date +%d%b).txt $rHost
         ;;
+      500)
+        echo -e "${TICK} $rHost:$rPort IPSEC / IKE checks"
+        nmap -v0 -p $rPort -sV --script ike-version -oN $rHost\_$rPort-$(date +%d%b).txt $rHost
+        ;;
       *)
         echo -e "${CROSS} undefined port to check, please update case statement with port '$rPort' and query options"
         echo -e "${COL_YELLOW}[**]${COL_NC} running version check for some generic information on port '$rPort'"
