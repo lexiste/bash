@@ -9,8 +9,6 @@
 #     easier to determine run-time issues and review output
 #  -] need to work on case statement for unknown port scanning, doesn't appear to be working properly
 #
-# 2021Jan08 -
-#  +] changed ftp scripts to execute
 #
 
 readonly coltable="/home/todd/scripts/bash/COL_TABLE"
@@ -34,8 +32,8 @@ while IFS=' ' read line || [[ -n "$line" ]]; do
    case $rPort in
       20|21|989|990)
         echo -e "${TICK} $rHost:$rPort FTP/SFTP/FTPS checks"
-        nmap -v0 -p $rPort -sV -Pn --script vulners,ftp-anon,ftp-bounce,ftp-syst,ftp-vsftpd-backdoor,ftp-proftpd-backdoor --script-timeout 1m -oN $rHost\_$rPort-$(date +%d%b).txt  $rHost
-       ;;
+        nmap -v0 -p $rPort -sV -Pn --script vulners,ftp* --script-timeout 1m -oN $rHost\_$rPort-$(date +%d%b).txt  $rHost
+        ;;
       22)
         echo -e "${TICK} $rHost:$rPort SSH checks"
         nmap -v0 -p $rPort -sV -Pn --script vulners,ssh2-enum-algos,default --script-timeout 1m -oN $rHost\_$rPort-$(date +%d%b).txt $rHost
@@ -49,7 +47,7 @@ while IFS=' ' read line || [[ -n "$line" ]]; do
         echo -e "${INFO} TFPT Checks use UDP and TCP and require SUDO access"
         sudo nmap -v0 -sTU -p $rPort -sV -Pn --script vulners,tftp* --script-timeout 1m -oN $rHost\_$rPort-$(date +%d%b).txt  $rHost
         ;;
-      80|443|8080|8081|8443)
+      80|443|8080|8081|8443|8444|8453)
         echo -e "${TICK} $rHost:$rPort limited HTTP(S) checks"
         # check if we have cuty capture which we use in out http-screenshot module when running with a GUI
         if [[ -x "/usr/bin/cutycapt" ]]
@@ -81,13 +79,16 @@ while IFS=' ' read line || [[ -n "$line" ]]; do
         echo -e "${TICK} $rHost:$rPort RPC checks"
         nmap -v0 -p $rPort -sV -Pn --script vulners,msrpc-enum,rpcinfo,nbstat,rpc-grind -oN $rHost\_$rPort-$(date +%d%b).txt $rHost
         ;;
-      161)
-         echo -e "${TICK} $rHost:$rPort SNMP checks"
-         nmap -v0 -sU -p $rPort -sV -Pn --script snmp-brute,snmp-info,snmp-interfaces,snmp-sysdescr,snmp-win32-shares,snmp-netstat -oN $rHost\_$rPort-$(date +%d%b).txt $rHost
-         ;;
+      2001|2002|4001|4002|6001|6002|9001|9002)
+        echo -e "${TICK} $rHost:$rPort Uncommon TELNET checks"
+        nmap -v0 -p $rPort -sV --script vulners,telnet-brute,banner -oN $rHost\_$rPort-$(date +%d%b).txt $rHost
+        ;;
+      13722|13723|13724|13782|13783)
+        echo -e "${TICK} $rHost:$rPort NetBackup - Network Data Management Protocol checks"
+        nmap -v0 -p $rPort -sV --script ndmp-fs-info,ndmp-serverinfo,ndmp-version -oN $rHost\_$rPort-$(date +%d%b).txt $rHost
+        ;;
       *)
-        rPort="22,25,80,443"
-        echo -e "${COL_YELLOW}${CROSS}${COL_NC} undefined port[s] to check, please update case statement as needed for specific query options"
+        echo -e "${CROSS} undefined port to check, please update case statement with port '$rPort' and query options"
         echo -e "${COL_YELLOW}[**]${COL_NC} running version check for some generic information on port '$rPort'"
         nmap -v0 -p $rPort -sV -Pn -oN $rHost\_$rPort-$(date +%d%b).txt $rHost
         ;;
